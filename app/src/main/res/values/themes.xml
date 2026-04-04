@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CrowTheatron.V26" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/crow_accent_yellow</item>
+        <item name="colorOnPrimary">@color/crow_bg</item>
+        <item name="colorSecondary">@color/crow_accent_blue</item>
+        <item name="colorTertiary">@color/crow_accent_red</item>
+        <item name="android:colorBackground">@color/crow_bg</item>
+        <item name="colorSurface">@color/crow_surface</item>
+        <item name="colorOnSurface">@color/crow_on_bg</item>
+        <!-- Solid black system bars; light status/nav icons (windowLight* = false). -->
+        <item name="android:statusBarColor">@color/crow_pure_black</item>
+        <item name="android:navigationBarColor">@color/crow_pure_black</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="materialButtonStyle">@style/Widget.CrowTheatron.Button</item>
+    </style>
+
+    <style name="Theme.CrowTheatron" parent="Theme.CrowTheatron.V26" />
+
+    <style name="Widget.CrowTheatron.Button" parent="Widget.Material3.Button.TonalButton">
+        <item name="backgroundTint">@color/crow_surface_elevated</item>
+        <item name="android:textColor">@color/crow_accent_yellow</item>
+    </style>
+</resources>

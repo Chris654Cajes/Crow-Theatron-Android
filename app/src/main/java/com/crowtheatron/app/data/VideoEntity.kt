@@ -1,0 +1,45 @@
+package com.crowtheatron.app.data
+
+import android.net.Uri
+
+data class VideoEntity(
+    val id: Long = 0L,
+    val uriString: String,
+    val title: String,
+    val folderGroup: String,
+    val durationMs: Long = 0L,
+    val sizeBytes: Long = 0L,
+    val thumbnail: ByteArray? = null,
+    val positionMs: Long = 0L,
+    val pitchSemitones: Int = 0,
+    val trimStartMs: Long = 0L,
+    val trimEndMs: Long = 0L,
+    val favorite: Boolean = false,
+    val seekJumpSec: Int = 15,
+    val autoPlayNext: Boolean = false,
+    val loopPlayback: Boolean = false,
+    val enhancement: EnhancementMode = EnhancementMode.NONE,
+    val lastPlayedAt: Long = 0L,
+) {
+    val contentUri: Uri get() = Uri.parse(uriString)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as VideoEntity
+        if (id != other.id) return false
+        if (uriString != other.uriString) return false
+        if (thumbnail != null) {
+            if (other.thumbnail == null) return false
+            if (!thumbnail.contentEquals(other.thumbnail)) return false
+        } else if (other.thumbnail != null) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + uriString.hashCode()
+        result = 31 * result + (thumbnail?.contentHashCode() ?: 0)
+        return result
+    }
+}

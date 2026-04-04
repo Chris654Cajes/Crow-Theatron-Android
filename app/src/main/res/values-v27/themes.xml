@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- White navigation bar buttons on black bar (API 27+). -->
+    <style name="Theme.CrowTheatron" parent="Theme.CrowTheatron.V26">
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>

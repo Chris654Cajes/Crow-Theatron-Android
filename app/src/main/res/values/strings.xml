@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Crow Théatron</string>
+    <string name="splash_credit">Written by Christopher Lee Cajes</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_memory">Memory</string>
+    <string name="nav_explore">Explore</string>
+    <string name="pick_folder">Select video folder</string>
+    <string name="scanning">Scanning videos…</string>
+    <string name="library_title">Library</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="memory_title">Playback memory</string>
+    <string name="explore_title">Search library</string>
+    <string name="enhancement_title">Video enhancement</string>
+    <string name="settings_title">Display &amp; playback</string>
+    <string name="offline_section">Offline storage</string>
+    <string name="duration_unknown">—</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+    <string name="pitch_label">Pitch / key (%1$d)</string>
+    <string name="trim_start">Trim start</string>
+    <string name="trim_end">Trim end</string>
+    <string name="save_prefs">Save for this video</string>
+    <string name="favorite_on">Favorite</string>
+    <string name="favorite_off">Unfavorite</string>
+    <string name="auto_next">Auto-play next</string>
+    <string name="loop">Loop</string>
+    <string name="default_seek_interval">Default skip interval (seconds)</string>
+</resources>

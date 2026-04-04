@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="crow_pure_black">#000000</color>
+    <color name="crow_bg">#121212</color>
+    <color name="crow_surface">#1E1E1E</color>
+    <color name="crow_surface_elevated">#252525</color>
+    <color name="crow_on_bg">#E8E8E8</color>
+    <color name="crow_on_muted">#9AA0A6</color>
+    <color name="crow_accent_yellow">#F5D547</color>
+    <color name="crow_accent_blue">#4A90E8</color>
+    <color name="crow_accent_red">#E84A4A</color>
+    <color name="crow_timeline_yellow">#E6C200</color>
+    <color name="crow_timeline_blue">#3B7DD6</color>
+</resources>
