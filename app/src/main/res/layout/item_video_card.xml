@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     app:cardBackgroundColor="@color/crow_surface_elevated"
-    app:cardCornerRadius="12dp"
-    app:strokeColor="@color/crow_accent_blue"
+    app:cardCornerRadius="14dp"
+    app:strokeColor="@color/crow_accent_cyan"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -27,13 +27,20 @@
                 android:scaleType="centerCrop"
                 tools:src="@android:color/darker_gray" />
 
+            <!-- Neon play overlay -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#22FF2D55" />
+
             <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:layout_gravity="center"
-                android:alpha="0.9"
+                android:alpha="0.92"
                 android:contentDescription="@null"
-                android:src="@android:drawable/ic_media_play" />
+                android:src="@android:drawable/ic_media_play"
+                app:tint="@color/crow_accent_red" />
         </FrameLayout>
 
         <LinearLayout

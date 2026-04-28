@@ -2,19 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
-            <solid android:color="#2A2A2A" />
+            <solid android:color="#1E1E2E" />
             <corners android:radius="4dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
-        <clip>
-            <shape android:shape="rectangle">
-                <solid android:color="@color/crow_accent_blue" />
-                <corners android:radius="4dp" />
-            </shape>
-        </clip>
-    </item>
-    <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape android:shape="rectangle">
                 <solid android:color="@color/crow_accent_yellow" />

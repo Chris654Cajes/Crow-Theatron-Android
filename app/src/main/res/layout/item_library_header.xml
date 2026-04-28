@@ -11,15 +11,9 @@
     android:gravity="center_vertical">
 
     <View
-        android:layout_width="4dp"
-        android:layout_height="36dp"
+        android:layout_width="3dp"
+        android:layout_height="32dp"
         android:background="@color/crow_accent_yellow" />
-
-    <View
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/bg_timeline_dot" />
 
     <TextView
         android:id="@+id/headerTitle"
@@ -28,7 +22,9 @@
         android:layout_marginStart="12dp"
         android:layout_weight="1"
         android:textColor="@color/crow_accent_yellow"
-        android:textSize="16sp"
+        android:textSize="13sp"
+        android:letterSpacing="0.10"
+        android:textAllCaps="true"
         android:textStyle="bold"
         tools:text="Movies / Action" />
 </LinearLayout>

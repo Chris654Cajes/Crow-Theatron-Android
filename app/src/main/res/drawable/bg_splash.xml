@@ -13,7 +13,7 @@
                 android:centerY="0.1"
                 android:endColor="#00000000"
                 android:gradientRadius="340dp"
-                android:startColor="#5AC94B6A"
+                android:startColor="#732301"
                 android:type="radial" />
         </shape>
     </item>
@@ -25,7 +25,7 @@
                 android:centerY="0.92"
                 android:endColor="#00000000"
                 android:gradientRadius="380dp"
-                android:startColor="#4818C4B8"
+                android:startColor="#000000"
                 android:type="radial" />
         </shape>
     </item>
@@ -37,7 +37,7 @@
                 android:centerY="0.88"
                 android:endColor="#00000000"
                 android:gradientRadius="360dp"
-                android:startColor="#503818C8"
+                android:startColor="#010973"
                 android:type="radial" />
         </shape>
     </item>

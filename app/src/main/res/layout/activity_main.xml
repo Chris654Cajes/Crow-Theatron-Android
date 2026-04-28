@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/crow_bg">
+    android:background="@color/crow_bg"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -21,7 +22,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,24 +31,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:paddingBottom="32dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:text="Local video theater — folders, memory, and playback tuned for you."
                 android:textColor="@color/crow_on_muted"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
+            <!-- ── Primary action ───────────────────────────── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPickFolder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/pick_folder"
                 android:textColor="@color/crow_bg"
@@ -63,19 +64,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/nav_library"
-                app:strokeColor="@color/crow_accent_blue" />
+                android:textColor="@color/crow_accent_cyan"
+                app:strokeColor="@color/crow_accent_cyan" />
 
+            <!-- ── Reset library ───────────────────────────── -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnResetLibrary"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:text="Reset library &amp; re-select folder"
+                android:textColor="@color/crow_accent_red"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconGravity="textStart"
+                app:iconTint="@color/crow_accent_red"
+                app:strokeColor="@color/crow_accent_red" />
+
+            <!-- ── Offline section ─────────────────────────── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="28dp"
                 android:text="@string/offline_section"
                 android:textColor="@color/crow_accent_yellow"
-                android:textSize="15sp"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
@@ -84,6 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Playback progress &amp; memory"
+                android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_recent_history"
                 app:iconTint="@color/crow_accent_yellow" />
 
@@ -93,8 +115,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_title"
+                android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_preferences"
-                app:iconTint="@color/crow_accent_blue" />
+                app:iconTint="@color/crow_accent_cyan" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEnhancement"
@@ -102,8 +125,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/enhancement_title"
+                android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_gallery"
-                app:iconTint="@color/crow_accent_red" />
+                app:iconTint="@color/crow_accent_purple" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -112,6 +137,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/crow_surface"
+        android:paddingBottom="0dp"
         app:itemIconTint="@color/crow_accent_yellow"
         app:itemTextColor="@color/crow_on_bg"
         app:labelVisibilityMode="labeled"
@@ -119,4 +145,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/menu_bottom_nav" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

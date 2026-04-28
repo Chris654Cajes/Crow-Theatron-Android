@@ -3,15 +3,17 @@
     <style name="Theme.CrowTheatron.V26" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/crow_accent_yellow</item>
         <item name="colorOnPrimary">@color/crow_bg</item>
-        <item name="colorSecondary">@color/crow_accent_blue</item>
+        <item name="colorSecondary">@color/crow_accent_cyan</item>
         <item name="colorTertiary">@color/crow_accent_red</item>
         <item name="android:colorBackground">@color/crow_bg</item>
         <item name="colorSurface">@color/crow_surface</item>
         <item name="colorOnSurface">@color/crow_on_bg</item>
-        <!-- Solid black system bars; light status/nav icons (windowLight* = false). -->
         <item name="android:statusBarColor">@color/crow_pure_black</item>
         <item name="android:navigationBarColor">@color/crow_pure_black</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="materialButtonStyle">@style/Widget.CrowTheatron.Button</item>
     </style>
@@ -21,5 +23,14 @@
     <style name="Widget.CrowTheatron.Button" parent="Widget.Material3.Button.TonalButton">
         <item name="backgroundTint">@color/crow_surface_elevated</item>
         <item name="android:textColor">@color/crow_accent_yellow</item>
+    </style>
+
+    <!-- Card style matching ClawMikia bg_card -->
+    <style name="Widget.CrowTheatron.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/crow_surface_elevated</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/crow_divider</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 </resources>

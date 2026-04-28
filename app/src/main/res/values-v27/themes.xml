@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- White navigation bar buttons on black bar (API 27+). -->
+    <!-- Light navigation bar buttons on black bar (API 27+). -->
+    <!-- Note: Android limits navigation bar button colors to light/dark only, not custom colors like gold -->
     <style name="Theme.CrowTheatron" parent="Theme.CrowTheatron.V26">
         <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@color/crow_pure_black</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 </resources>

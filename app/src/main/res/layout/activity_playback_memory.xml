@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/crow_bg">
+    android:background="@color/crow_bg"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -44,6 +45,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/crow_surface"
+        android:paddingBottom="0dp"
         app:itemIconTint="@color/crow_accent_yellow"
         app:itemTextColor="@color/crow_on_bg"
         app:labelVisibilityMode="labeled"
@@ -51,4 +53,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/menu_bottom_nav" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

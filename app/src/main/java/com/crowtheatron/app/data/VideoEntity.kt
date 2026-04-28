@@ -20,6 +20,9 @@ data class VideoEntity(
     val loopPlayback: Boolean = false,
     val enhancement: EnhancementMode = EnhancementMode.NONE,
     val lastPlayedAt: Long = 0L,
+    // Persisted playback customisations
+    val playbackSpeed: Float = 1.0f,
+    val volumeLevel: Float = 1.0f,
 ) {
     val contentUri: Uri get() = Uri.parse(uriString)
 
