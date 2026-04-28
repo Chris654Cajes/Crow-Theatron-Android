@@ -51,11 +51,14 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
+                android:gravity="start|center_vertical"
                 android:text="@string/pick_folder"
                 android:textColor="@color/crow_bg"
                 app:backgroundTint="@color/crow_accent_yellow"
                 app:icon="@android:drawable/ic_input_add"
                 app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="14dp"
                 app:iconTint="@color/crow_bg" />
 
             <com.google.android.material.button.MaterialButton
@@ -66,8 +69,14 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
+                android:gravity="start|center_vertical"
                 android:text="@string/nav_library"
                 android:textColor="@color/crow_accent_cyan"
+                app:icon="@android:drawable/ic_menu_agenda"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="14dp"
+                app:iconTint="@color/crow_accent_cyan"
                 app:strokeColor="@color/crow_accent_cyan" />
 
             <!-- ── Reset library ───────────────────────────── -->
@@ -79,10 +88,13 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
+                android:gravity="start|center_vertical"
                 android:text="Reset library &amp; re-select folder"
                 android:textColor="@color/crow_accent_red"
                 app:icon="@android:drawable/ic_menu_delete"
                 app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="14dp"
                 app:iconTint="@color/crow_accent_red"
                 app:strokeColor="@color/crow_accent_red" />
 
@@ -92,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="28dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/offline_section"
                 android:textColor="@color/crow_accent_yellow"
                 android:textSize="11sp"
@@ -104,9 +117,13 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
                 android:text="Playback progress &amp; memory"
                 android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_recent_history"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="18dp"
                 app:iconTint="@color/crow_accent_yellow" />
 
             <com.google.android.material.button.MaterialButton
@@ -114,9 +131,13 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
                 android:text="@string/settings_title"
                 android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_preferences"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="18dp"
                 app:iconTint="@color/crow_accent_cyan" />
 
             <com.google.android.material.button.MaterialButton
@@ -124,9 +145,13 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
                 android:text="@string/enhancement_title"
                 android:textColor="@color/crow_on_bg"
                 app:icon="@android:drawable/ic_menu_gallery"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="18dp"
                 app:iconTint="@color/crow_accent_purple" />
 
         </LinearLayout>
