@@ -6,8 +6,8 @@ class AppPrefs(context: Context) {
     private val p = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     var defaultSeekJumpSec: Int
-        get() = p.getInt(KEY_SEEK_JUMP, 15)
-        set(v) = p.edit().putInt(KEY_SEEK_JUMP, v.coerceIn(5, 300)).apply()
+        get() = 10
+        set(v) = p.edit().putInt(KEY_SEEK_JUMP, 10).apply()
 
     var defaultEnhancement: EnhancementMode
         get() = EnhancementMode.fromKey(p.getString(KEY_ENHANCEMENT, null))

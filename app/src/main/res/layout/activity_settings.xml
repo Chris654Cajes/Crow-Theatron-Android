@@ -95,7 +95,8 @@
                         android:id="@+id/seekBarInterval"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="295"
+                        android:enabled="false"
+                        android:max="0"
                         android:progressTint="@color/crow_accent_cyan"
                         android:progressBackgroundTint="@color/crow_divider"
                         android:thumbTint="@color/crow_accent_cyan" />
@@ -104,7 +105,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="New videos inherit this skip interval until you change it per title in the player."
+                        android:text="Fast forward and rewind are fixed at 10 seconds."
                         android:textColor="@color/crow_on_muted"
                         android:textSize="12sp"
                         android:lineSpacingMultiplier="1.4" />

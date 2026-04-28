@@ -28,5 +28,5 @@
     <string name="favorite_off">Unfavorite</string>
     <string name="auto_next">Auto-play next</string>
     <string name="loop">Loop</string>
-    <string name="default_seek_interval">Default skip interval (seconds)</string>
+    <string name="default_seek_interval">Skip interval (seconds)</string>
 </resources>

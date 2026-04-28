@@ -15,7 +15,7 @@ data class VideoEntity(
     val trimStartMs: Long = 0L,
     val trimEndMs: Long = 0L,
     val favorite: Boolean = false,
-    val seekJumpSec: Int = 15,
+    val seekJumpSec: Int = 10,
     val autoPlayNext: Boolean = false,
     val loopPlayback: Boolean = false,
     val enhancement: EnhancementMode = EnhancementMode.NONE,

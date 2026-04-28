@@ -20,20 +20,10 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        val sec = prefs.defaultSeekJumpSec.coerceIn(5, 300)
-        binding.seekBarInterval.progress = sec - 5
+        prefs.defaultSeekJumpSec = 10
+        val sec = prefs.defaultSeekJumpSec
+        binding.seekBarInterval.progress = 0
         binding.seekValue.text = sec.toString()
-
-        binding.seekBarInterval.setOnSeekBarChangeListener(
-            object : android.widget.SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
-                    val v = progress + 5
-                    binding.seekValue.text = v.toString()
-                    if (fromUser) prefs.defaultSeekJumpSec = v
-                }
-                override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
-            }
-        )
+        binding.seekBarInterval.isEnabled = false
     }
 }

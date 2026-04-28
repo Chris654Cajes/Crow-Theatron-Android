@@ -337,8 +337,8 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         // Rewind / forward: pure seekTo on the already-loaded player, no restart
-        binding.btnRewind.setOnClickListener  { jumpBy(-working.seekJumpSec) }
-        binding.btnForward.setOnClickListener { jumpBy( working.seekJumpSec) }
+        binding.btnRewind.setOnClickListener  { jumpBy(-SEEK_JUMP_SECONDS) }
+        binding.btnForward.setOnClickListener { jumpBy(SEEK_JUMP_SECONDS) }
 
         binding.btnPrev.setOnClickListener { playAdjacent(-1) }
         binding.btnNext.setOnClickListener { playAdjacent(1) }
@@ -584,6 +584,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun pitchLabel(semis: Int)     = "${if (semis > 0) "+$semis" else "$semis"} st"
 
     companion object {
+        private const val SEEK_JUMP_SECONDS = 10
         const val EXTRA_VIDEO_ID       = "video_id"
         const val EXTRA_PLAYLIST_IDS   = "playlist_ids"
         const val EXTRA_PLAYLIST_INDEX = "playlist_index"
