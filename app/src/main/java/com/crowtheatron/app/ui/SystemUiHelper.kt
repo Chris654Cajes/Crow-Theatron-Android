@@ -3,6 +3,7 @@ package com.crowtheatron.app.ui
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import com.crowtheatron.app.R
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -25,11 +26,16 @@ fun AppCompatActivity.setContentWithCrowInsets(contentRoot: View) {
     setContentView(contentRoot)
     
     // Set navigation bar to completely opaque black - aggressive approach
+    // Ensure the window draws the background
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+// Clear translucent flag if set previously
+    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+// Set to solid black
     window.navigationBarColor = Color.BLACK
-    window.navigationBarColor = 0xFF000000.toInt() // Pure black with full opacity
-    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-    
+// Alternatively, for explicit opacity: window.navigationBarColor = 0xFF000000.toInt()
+
+
+
     // Force navigation bar color again after a delay to ensure it sticks
     contentRoot.postDelayed({
         window.navigationBarColor = Color.BLACK

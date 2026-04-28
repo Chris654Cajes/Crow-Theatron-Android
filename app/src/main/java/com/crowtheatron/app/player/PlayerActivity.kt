@@ -123,16 +123,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Force navigation bar to be completely opaque black - multiple approaches
         window.navigationBarColor = Color.BLACK
-        window.navigationBarColor = 0xFF000000.toInt()
-        // Prevent navigation bar from becoming transparent
-        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-        // Force opaque navigation bar
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
-        }
     }
     override fun onStop()    { persistProgress(); super.onStop() }
     override fun onDestroy() {
@@ -573,8 +564,6 @@ class PlayerActivity : AppCompatActivity() {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             supportActionBar?.show()
             binding.playerView.layoutParams.height = (220 * resources.displayMetrics.density).toInt()
-            // Reset navigation bar to black when exiting fullscreen
-            window.navigationBarColor = 0xFF000000.toInt()
         }
         binding.playerView.requestLayout()
     }
