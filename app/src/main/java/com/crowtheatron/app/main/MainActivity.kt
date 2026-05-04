@@ -26,27 +26,31 @@ class MainActivity : AppCompatActivity() {
         BottomNavHelper.setup(this, binding.bottomNav, R.id.nav_home)
 
         binding.bottomNav.setOnItemReselectedListener { item ->
-            if (item.itemId == R.id.nav_home) {
-                BottomNavHelper.openFolderSelect(this)
-            }
+            if (item.itemId == R.id.nav_home) BottomNavHelper.openFolderSelect(this)
         }
 
         binding.btnPickFolder.setOnClickListener { BottomNavHelper.openFolderSelect(this) }
 
         binding.btnOpenLibrary.setOnClickListener {
-            startActivity(
-                Intent(this, LibraryActivity::class.java)
-                    .putExtra(LibraryActivity.EXTRA_MODE, LibraryActivity.MODE_ALL)
-            )
+            startActivity(Intent(this, LibraryActivity::class.java)
+                .putExtra(LibraryActivity.EXTRA_MODE, LibraryActivity.MODE_ALL))
+        }
+
+        // Continue Watching quick tile
+        binding.btnContinueWatching.setOnClickListener {
+            startActivity(Intent(this, LibraryActivity::class.java)
+                .putExtra(LibraryActivity.EXTRA_MODE, LibraryActivity.MODE_CONTINUE))
         }
 
         binding.btnResetLibrary.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Reset library?")
-                .setMessage("This will delete all videos from the library, including playback history and preferences. You will be asked to select a folder again. This cannot be undone.")
+                .setMessage("This will delete all videos from the library, including playback history, profiles, chapters and preferences. This cannot be undone.")
                 .setPositiveButton("Reset") { _, _ ->
                     val db = CrowDbHelper(this)
                     db.writableDatabase.execSQL("DELETE FROM ${CrowDbHelper.TABLE_VIDEOS}")
+                    db.writableDatabase.execSQL("DELETE FROM ${CrowDbHelper.TABLE_PROFILES}")
+                    db.writableDatabase.execSQL("DELETE FROM ${CrowDbHelper.TABLE_CHAPTERS}")
                     db.close()
                     BottomNavHelper.openFolderSelect(this)
                 }

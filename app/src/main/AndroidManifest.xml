@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Storage & media permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Foreground service for background playback -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- Keep screen on during playback -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- PiP requires no extra permission, but declare feature -->
+    <uses-feature android:name="android.software.picture_in_picture"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
@@ -41,7 +58,10 @@
         <activity
             android:name=".player.PlayerActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-            android:exported="false" />
+            android:exported="false"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:launchMode="singleTop" />
 
         <activity
             android:name=".settings.SettingsActivity"
@@ -50,5 +70,16 @@
         <activity
             android:name=".enhancement.VideoEnhancementActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".profile.PlaybackProfilesActivity"
+            android:exported="false" />
+
+        <!-- Background playback service -->
+        <service
+            android:name=".service.PlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
     </application>
 </manifest>

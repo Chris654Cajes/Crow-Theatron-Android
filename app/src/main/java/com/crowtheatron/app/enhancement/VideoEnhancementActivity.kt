@@ -25,7 +25,7 @@ class VideoEnhancementActivity : AppCompatActivity() {
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = EnhancementListAdapter { mode ->
             prefs.defaultEnhancement = mode
-            Toast.makeText(this, "Default enhancement: ${mode.name.replace('_', ' ')}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Default enhancement: ${mode.displayName}", Toast.LENGTH_SHORT).show()
         }
     }
 }

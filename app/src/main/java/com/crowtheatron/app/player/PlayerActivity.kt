@@ -1,16 +1,30 @@
 package com.crowtheatron.app.player
 
+import android.app.PictureInPictureParams
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
+import android.util.Rational
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -19,12 +33,17 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.crowtheatron.app.R
+import com.crowtheatron.app.data.ChapterMarker
 import com.crowtheatron.app.data.EnhancementMode
 import com.crowtheatron.app.data.VideoEntity
 import com.crowtheatron.app.data.VideoRepository
 import com.crowtheatron.app.databinding.ActivityPlayerBinding
+import com.crowtheatron.app.profile.PlaybackProfilesActivity
+import com.crowtheatron.app.service.PlaybackService
 import com.crowtheatron.app.ui.setContentWithCrowInsets
 import com.crowtheatron.app.util.FormatUtils
+import com.crowtheatron.app.util.VideoEnhancement
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -43,12 +62,42 @@ class PlayerActivity : AppCompatActivity() {
     private var userScrubbingPlayback = false
     private var playerReady = false
     private var isFullscreen = false
-
-    // True while we are programmatically setting seekbar values — suppresses listeners
     private var isBindingUi = false
+    private var controlsVisible = true
+    private var chapters = listOf<ChapterMarker>()
 
     private var currentSpeed  = 1.0f
     private var currentVolume = 1.0f
+
+    // ── Gesture state ─────────────────────────────────────────────────────────
+    private var isGestureSeeking = false
+    private var gestureSeekStartPos = 0L
+    private var gestureBrightnessStart = 0f
+    private var gestureVolumeStart = 0f
+    private var currentBrightness = 0.5f // 0..1, affects window brightness
+
+    // ── Scale (pinch zoom) ────────────────────────────────────────────────────
+    private var scaleGestureDetector: ScaleGestureDetector? = null
+    private var currentZoom = 1f
+
+    // ── Service binding ───────────────────────────────────────────────────────
+    private var playbackService: PlaybackService? = null
+    private var serviceBound = false
+    private val serviceConn = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+            val lb = binder as PlaybackService.LocalBinder
+            playbackService = lb.getService()
+            serviceBound = true
+            // Player already initialised locally - just register for notifications
+        }
+        override fun onServiceDisconnected(name: ComponentName) {
+            serviceBound = false
+            playbackService = null
+        }
+    }
+
+    // ── Auto-hide controls ────────────────────────────────────────────────────
+    private val hideControlsRunnable = Runnable { hideControls() }
 
     // ── Tick ──────────────────────────────────────────────────────────────────
     private val tickRunnable = object : Runnable {
@@ -63,23 +112,24 @@ class PlayerActivity : AppCompatActivity() {
         override fun onPlaybackStateChanged(state: Int) {
             playerReady = state == Player.STATE_READY || state == Player.STATE_BUFFERING
             if (state == Player.STATE_READY) {
-                isBindingUi = true
-                bindTrimSeekers()
-                isBindingUi = false
+                isBindingUi = true; bindTrimSeekers(); isBindingUi = false
                 tickTimeline()
+                applyZoom(working.zoomLevel)
             }
             if (state == Player.STATE_ENDED) {
                 if (binding.switchLoop.isChecked) {
-                    // Seek to trim start, not file start
-                    player?.seekTo(working.trimStartMs.coerceAtLeast(0L))
-                    player?.play()
+                    player?.seekTo(working.trimStartMs.coerceAtLeast(0L)); player?.play()
                 } else if (binding.switchAutoNext.isChecked) {
                     playAdjacent(1)
                 }
             }
             updatePlayPauseIcon()
+            updateServiceNotification()
         }
-        override fun onIsPlayingChanged(isPlaying: Boolean) = updatePlayPauseIcon()
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            updatePlayPauseIcon()
+            if (isPlaying) scheduleHideControls() else showControls()
+        }
         override fun onPlayerError(error: PlaybackException) {
             Toast.makeText(this@PlayerActivity,
                 "Playback error: ${error.message ?: "code ${error.errorCode}"}",
@@ -97,7 +147,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         val startId = intent.getLongExtra(EXTRA_VIDEO_ID, -1L)
-        var ids     = intent.getLongArrayExtra(EXTRA_PLAYLIST_IDS)
+        var ids = intent.getLongArrayExtra(EXTRA_PLAYLIST_IDS)
         if ((ids == null || ids.isEmpty()) && startId > 0L) ids = longArrayOf(startId)
         playlistIds = ids ?: longArrayOf()
         if (playlistIds.isEmpty()) { showAndFinish("Missing video"); return }
@@ -112,52 +162,89 @@ class PlayerActivity : AppCompatActivity() {
 
         currentSpeed  = working.playbackSpeed.coerceIn(0.5f, 2.0f)
         currentVolume = working.volumeLevel.coerceIn(0f, 1f)
+        currentZoom   = working.zoomLevel.coerceIn(1f, 3f)
+        currentBrightness = 0.5f
 
+        chapters = repo.listChapters(working.id)
+
+        setupGestures()
         setupEnhancementSpinner()
         bindUiFromWorking()
         setupControls()
-        initPlayer()
-        attachCurrentMedia(play = true)
+        startAndBindService()
+        // Init player immediately (service binding may be async)
+        initPlayerIfNeeded()
         handler.post(tickRunnable)
     }
 
     override fun onResume() {
         super.onResume()
         window.navigationBarColor = Color.BLACK
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
-    override fun onStop()    { persistProgress(); super.onStop() }
+
+    override fun onPause() {
+        super.onPause()
+        persistProgress()
+    }
+
+    override fun onStop() {
+        persistProgress()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        super.onStop()
+    }
+
     override fun onDestroy() {
-        handler.removeCallbacks(tickRunnable)
+        handler.removeCallbacksAndMessages(null)
         player?.removeListener(playerListener)
-        player?.release()
-        player = null
+        if (!isInPictureInPictureMode) {
+            player?.pause()
+        }
+        if (serviceBound) {
+            unbindService(serviceConn)
+            serviceBound = false
+        }
         super.onDestroy()
     }
 
-    private fun showAndFinish(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); finish()
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (player?.isPlaying == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            enterPiP()
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(isInPiPMode: Boolean, newConfig: android.content.res.Configuration) {
+        super.onPictureInPictureModeChanged(isInPiPMode, newConfig)
+        if (isInPiPMode) {
+            hideControls()
+            binding.toolbar.visibility = View.GONE
+            binding.controlsOverlay.visibility = View.GONE
+        } else {
+            binding.toolbar.visibility = View.VISIBLE
+            showControls()
+        }
+    }
+
+    // ── Service ───────────────────────────────────────────────────────────────
+
+    private fun startAndBindService() {
+        val intent = Intent(this, PlaybackService::class.java)
+        startService(intent)
+        bindService(intent, serviceConn, BIND_AUTO_CREATE)
     }
 
     // ── Player setup ──────────────────────────────────────────────────────────
-    private fun initPlayer() {
+
+    private fun initPlayerIfNeeded() {
         if (player != null) return
         val exo = ExoPlayer.Builder(this).build()
         exo.addListener(playerListener)
         player = exo
         binding.playerView.player = exo
+        attachCurrentMedia(play = true)
     }
 
-    /**
-     * Build a MediaItem for [e].
-     * We do NOT use ClippingConfiguration.setStartPositionMs because it remaps
-     * the ExoPlayer timeline so currentPosition becomes clip-relative (0-based),
-     * which breaks all absolute-position arithmetic for seek, rewind, and forward.
-     *
-     * Instead:
-     *  - Trim start → seekTo(trimStartMs) after prepare()
-     *  - Trim end   → ClippingConfiguration.setEndPositionMs only (safe upper bound,
-     *                 does NOT remap currentPosition)
-     */
     private fun mediaItemFor(e: VideoEntity): MediaItem {
         val builder = MediaItem.Builder().setUri(e.contentUri)
         val endMs = e.trimEndMs
@@ -171,31 +258,24 @@ class PlayerActivity : AppCompatActivity() {
         return builder.build()
     }
 
-    /**
-     * Load [working] into the player.
-     * After prepare(), seeks to the persisted absolute position (clamped to trim window).
-     * All subsequent position values from exo.currentPosition are absolute file ms.
-     */
     private fun attachCurrentMedia(play: Boolean) {
         val exo = player ?: return
         playerReady = false
         exo.stop()
         exo.setMediaItem(mediaItemFor(working))
         exo.prepare()
-
-        // Resume at saved absolute position, clamped inside trim window
         val trimLo = working.trimStartMs.coerceAtLeast(0L)
         val trimHi = if (working.trimEndMs > 0L) working.trimEndMs else Long.MAX_VALUE
         val resumeMs = working.positionMs.coerceIn(trimLo, trimHi)
-        // If no saved position, start at trim start
         exo.seekTo(if (resumeMs > 0L) resumeMs else trimLo)
-
         applyPitchAndSpeed(working.pitchSemitones, currentSpeed)
-        exo.volume = currentVolume
+        exo.volume = currentVolume * working.audioBoost.coerceIn(1f, 2f)
         exo.repeatMode = if (working.loopPlayback) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
         exo.playWhenReady = play
-        binding.playerView.postDelayed({ applyEnhancementOverlay() }, 120L)
+        binding.playerView.postDelayed({ applyEnhancementMatrix() }, 120L)
         updatePlayPauseIcon()
+        playbackService?.updateNotification(working.title,
+            if (play) "Playing" else "Paused")
     }
 
     private fun applyPitchAndSpeed(semitones: Int, speed: Float) {
@@ -203,32 +283,213 @@ class PlayerActivity : AppCompatActivity() {
         player?.playbackParameters = PlaybackParameters(speed.coerceIn(0.5f, 2.0f), pitch)
     }
 
+    // ── Enhancement ───────────────────────────────────────────────────────────
+
+    private fun applyEnhancementMatrix() {
+        val matrix = VideoEnhancement.buildCombinedMatrix(
+            mode       = working.enhancement,
+            brightness = working.brightness,
+            contrast   = working.contrast,
+            saturation = working.saturation,
+            hue        = working.hue,
+        )
+        // Apply to PlayerView's TextureView via a Paint
+        try {
+            val tv = binding.playerView.videoSurfaceView
+            if (tv is android.view.TextureView) {
+                // Use canvas layer paint for color filtering
+                val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(matrix) }
+                tv.setLayerType(View.LAYER_TYPE_HARDWARE, paint)
+            }
+        } catch (_: Exception) {}
+
+        // Simple overlay for ambient color
+        val o = binding.enhancementOverlay
+        when (working.enhancement) {
+            EnhancementMode.NONE            -> o.visibility = View.GONE
+            EnhancementMode.WARM_FILM       -> { o.setBackgroundColor(Color.argb(35,255,180,80)); o.visibility = View.VISIBLE }
+            EnhancementMode.COOL_HDR_SIM    -> { o.setBackgroundColor(Color.argb(30,80,140,255)); o.visibility = View.VISIBLE }
+            EnhancementMode.NIGHT_MODE      -> { o.setBackgroundColor(Color.argb(40,255,80,0)); o.visibility = View.VISIBLE }
+            EnhancementMode.EYE_COMFORT     -> { o.setBackgroundColor(Color.argb(30,255,200,50)); o.visibility = View.VISIBLE }
+            else                            -> o.visibility = View.GONE
+        }
+    }
+
+    // ── Zoom ──────────────────────────────────────────────────────────────────
+
+    private fun applyZoom(zoom: Float) {
+        val z = zoom.coerceIn(1f, 3f)
+        currentZoom = z
+        binding.playerView.scaleX = z
+        binding.playerView.scaleY = z
+    }
+
+    // ── Gestures ──────────────────────────────────────────────────────────────
+
+    private fun setupGestures() {
+        scaleGestureDetector = ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val newZoom = (currentZoom * detector.scaleFactor).coerceIn(1f, 3f)
+                applyZoom(newZoom)
+                working = working.copy(zoomLevel = newZoom)
+                return true
+            }
+        })
+
+        val gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                toggleControlsVisibility()
+                return true
+            }
+
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                val screenWidth = binding.playerView.width.toFloat()
+                val tapX = e.x
+                if (tapX < screenWidth / 3f) {
+                    // Left third — rewind
+                    jumpBy(-10)
+                    showGestureHint("⏪ -10s")
+                } else if (tapX > screenWidth * 2f / 3f) {
+                    // Right third — fast forward
+                    jumpBy(+10)
+                    showGestureHint("⏩ +10s")
+                } else {
+                    // Centre — play/pause
+                    player?.let { if (it.isPlaying) it.pause() else it.play() }
+                }
+                return true
+            }
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distX: Float, distY: Float): Boolean {
+                val e1nn = e1 ?: return false
+                val screenWidth = binding.playerView.width.toFloat()
+                val dx = abs(distX)
+                val dy = abs(distY)
+
+                if (dx > dy) {
+                    // Horizontal swipe = seek
+                    val dur = liveDurationMs()
+                    val seekDeltaMs = (-distX / screenWidth * dur * 0.3f).toLong()
+                    val exo = player ?: return false
+                    val newPos = (exo.currentPosition + seekDeltaMs)
+                        .coerceIn(working.trimStartMs.coerceAtLeast(0L),
+                            if (working.trimEndMs > 0L) working.trimEndMs else dur)
+                    exo.seekTo(newPos)
+                    showGestureHint(FormatUtils.formatDuration(newPos))
+                } else {
+                    // Vertical swipe
+                    val swipeZone = e1nn.x / screenWidth
+                    if (swipeZone < 0.5f) {
+                        // Left half = brightness
+                        val delta = -distY / binding.playerView.height
+                        currentBrightness = (currentBrightness + delta * 0.5f).coerceIn(0.01f, 1f)
+                        val lp = window.attributes
+                        lp.screenBrightness = currentBrightness
+                        window.attributes = lp
+                        showGestureHint("☀ ${(currentBrightness * 100).toInt()}%")
+                    } else {
+                        // Right half = volume
+                        val delta = -distY / binding.playerView.height
+                        currentVolume = (currentVolume + delta * 0.5f).coerceIn(0f, 1f)
+                        player?.volume = currentVolume * working.audioBoost.coerceIn(1f, 2f)
+                        working = working.copy(volumeLevel = currentVolume)
+                        binding.seekVolume.progress = (currentVolume * 100).toInt()
+                        binding.tvVolumeValue.text = "${(currentVolume * 100).toInt()}%"
+                        showGestureHint("🔊 ${(currentVolume * 100).toInt()}%")
+                    }
+                }
+                return true
+            }
+        })
+
+        binding.playerView.setOnTouchListener { _, event ->
+            scaleGestureDetector?.onTouchEvent(event)
+            if (scaleGestureDetector?.isInProgress == false) {
+                gestureDetector.onTouchEvent(event)
+            }
+            true
+        }
+    }
+
+    private fun showGestureHint(text: String) {
+        binding.gestureHintText.text = text
+        binding.gestureHintOverlay.visibility = View.VISIBLE
+        binding.gestureHintOverlay.alpha = 1f
+        handler.removeCallbacks(hideGestureHintRunnable)
+        handler.postDelayed(hideGestureHintRunnable, 800L)
+    }
+
+    private val hideGestureHintRunnable = Runnable {
+        binding.gestureHintOverlay.animate()
+            .alpha(0f).setDuration(300L)
+            .withEndAction { binding.gestureHintOverlay.visibility = View.GONE }
+            .start()
+    }
+
+    // ── Controls visibility ───────────────────────────────────────────────────
+
+    private fun toggleControlsVisibility() {
+        if (controlsVisible) hideControls() else showControls()
+    }
+
+    private fun showControls() {
+        controlsVisible = true
+        binding.controlsOverlay.animate()
+            .alpha(1f).setDuration(200L)
+            .withStartAction { binding.controlsOverlay.visibility = View.VISIBLE }
+            .start()
+        binding.toolbar.animate().alpha(1f).setDuration(200L)
+            .withStartAction { binding.toolbar.visibility = View.VISIBLE }.start()
+        if (player?.isPlaying == true) scheduleHideControls()
+    }
+
+    private fun hideControls() {
+        if (isFullscreen) {
+            controlsVisible = false
+            binding.controlsOverlay.animate()
+                .alpha(0f).setDuration(300L)
+                .withEndAction { binding.controlsOverlay.visibility = View.GONE }
+                .start()
+            binding.toolbar.animate().alpha(0f).setDuration(300L)
+                .withEndAction { binding.toolbar.visibility = View.GONE }.start()
+        }
+    }
+
+    private fun scheduleHideControls() {
+        handler.removeCallbacks(hideControlsRunnable)
+        handler.postDelayed(hideControlsRunnable, 3500L)
+    }
+
     // ── Duration helpers ──────────────────────────────────────────────────────
 
-    /** Absolute file duration from ExoPlayer when ready, else metadata. */
     private fun liveDurationMs(): Long {
         val d = player?.duration ?: C.TIME_UNSET
         return if (d != C.TIME_UNSET && d > 0L) d else working.durationMs.takeIf { it > 0L } ?: 1L
     }
 
-    /** Metadata-only file duration (does not call ExoPlayer). */
     private fun metaDurationMs(): Long = working.durationMs.takeIf { it > 0L } ?: 1L
 
     // ── Timeline ──────────────────────────────────────────────────────────────
+
     private fun tickTimeline() {
         val exo = player ?: return
         val dur = exo.duration
         if (dur == C.TIME_UNSET || dur <= 0L) return
-        val pos = exo.currentPosition          // absolute ms from file start
+        val pos = exo.currentPosition
         val progress = ((pos * 1000L) / dur).toInt().coerceIn(0, 1000)
         if (!userScrubbingPlayback) binding.seekPlayback.progress = progress
         updateTimeLabel(pos, dur)
+        checkChapterTransitions(pos)
     }
 
     private fun updateTimeLabel(absPos: Long, dur: Long) {
         val label = "${FormatUtils.formatDuration(absPos)} / ${FormatUtils.formatDuration(dur)}"
         binding.timeLabel.text      = label
         binding.tvPlaybackTime.text = label
+    }
+
+    private fun checkChapterTransitions(posMs: Long) {
+        // Highlight nearest chapter in timeline — future: show chapter name
     }
 
     private fun updatePlayPauseIcon() {
@@ -238,36 +499,37 @@ class PlayerActivity : AppCompatActivity() {
         )
     }
 
+    private fun updateServiceNotification() {
+        val state = when {
+            player?.isPlaying == true -> "Playing"
+            player?.playbackState == Player.STATE_BUFFERING -> "Buffering…"
+            else -> "Paused"
+        }
+        playbackService?.updateNotification(working.title, state)
+    }
+
     // ── UI binding ────────────────────────────────────────────────────────────
+
     private fun bindUiFromWorking() {
         isBindingUi = true
-
         binding.toolbar.title   = working.title
         binding.videoTitle.text = working.title
-
         val semis = working.pitchSemitones.coerceIn(-6, 6)
-        binding.seekPitch.progress = semis + 6
-        binding.pitchLabel.text    = pitchLabel(semis)
-
-        binding.seekSpeed.progress = speedToProgress(currentSpeed)
-        binding.tvSpeedValue.text  = speedLabel(currentSpeed)
-
-        binding.seekVolume.progress = (currentVolume * 100).toInt()
-        binding.tvVolumeValue.text  = "${(currentVolume * 100).toInt()}%"
-
+        binding.seekPitch.progress    = semis + 6
+        binding.pitchLabel.text       = pitchLabel(semis)
+        binding.seekSpeed.progress    = speedToProgress(currentSpeed)
+        binding.tvSpeedValue.text     = speedLabel(currentSpeed)
+        binding.seekVolume.progress   = (currentVolume * 100).toInt()
+        binding.tvVolumeValue.text    = "${(currentVolume * 100).toInt()}%"
         binding.switchAutoNext.isChecked = working.autoPlayNext
         binding.switchLoop.isChecked     = working.loopPlayback
-
         binding.btnFavorite.text = getString(
             if (working.favorite) R.string.favorite_off else R.string.favorite_on
         )
-
         val idx = EnhancementMode.entries.indexOf(working.enhancement).coerceAtLeast(0)
         binding.spinnerEnhancement.setSelection(idx)
-
         bindTrimSeekers()
         updateTimeLabel(working.positionMs.coerceAtLeast(0L), metaDurationMs())
-
         isBindingUi = false
     }
 
@@ -281,7 +543,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun setupEnhancementSpinner() {
-        val labels = EnhancementMode.entries.map { it.name.replace('_', ' ') }
+        val labels = EnhancementMode.entries.map { it.displayName }
         val ad = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels) {
             override fun getView(pos: Int, convert: View?, parent: android.view.ViewGroup) =
                 super.getView(pos, convert, parent).also {
@@ -301,56 +563,52 @@ class PlayerActivity : AppCompatActivity() {
         binding.spinnerEnhancement.adapter = ad
         binding.spinnerEnhancement.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (isBindingUi) return          // suppress during bindUiFromWorking
+                if (isBindingUi) return
                 val mode = EnhancementMode.entries.getOrNull(position) ?: return
                 working = working.copy(enhancement = mode)
-                applyEnhancementOverlay()
+                applyEnhancementMatrix()
                 persistPrefs()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 
-    private fun applyEnhancementOverlay() {
-        val o = binding.enhancementOverlay
-        when (working.enhancement) {
-            EnhancementMode.NONE            -> o.visibility = View.GONE
-            EnhancementMode.VIVID_HD        -> { o.setBackgroundColor(Color.argb(45,255,240,160)); o.visibility = View.VISIBLE }
-            EnhancementMode.CINEMA_CONTRAST -> { o.setBackgroundColor(Color.argb(55, 20, 20, 40)); o.visibility = View.VISIBLE }
-            EnhancementMode.WARM_FILM       -> { o.setBackgroundColor(Color.argb(50,255,180, 80)); o.visibility = View.VISIBLE }
-            EnhancementMode.COOL_HDR_SIM    -> { o.setBackgroundColor(Color.argb(48, 80,140,255)); o.visibility = View.VISIBLE }
-        }
-    }
+    // ── Controls setup ────────────────────────────────────────────────────────
 
-    // ── Controls ──────────────────────────────────────────────────────────────
     private fun setupControls() {
-
         binding.btnPlayPause.setOnClickListener {
             player?.let { if (it.isPlaying) it.pause() else it.play() }
         }
-
         binding.btnStop.setOnClickListener {
             player?.pause()
             player?.seekTo(working.trimStartMs.coerceAtLeast(0L))
-            persistProgress()
-            tickTimeline()
+            persistProgress(); tickTimeline()
+        }
+        binding.btnRewind.setOnClickListener  { jumpBy(-SEEK_JUMP_SECONDS) }
+        binding.btnForward.setOnClickListener { jumpBy(SEEK_JUMP_SECONDS)  }
+        binding.btnPrev.setOnClickListener    { playAdjacent(-1) }
+        binding.btnNext.setOnClickListener    { playAdjacent(1) }
+        binding.btnFullscreen.setOnClickListener { toggleFullscreen() }
+        binding.btnPip.setOnClickListener { enterPiP() }
+
+        // Profiles button
+        binding.btnProfiles.setOnClickListener {
+            startActivity(Intent(this, PlaybackProfilesActivity::class.java)
+                .putExtra(PlaybackProfilesActivity.EXTRA_VIDEO_ID, working.id))
         }
 
-        // Rewind / forward: pure seekTo on the already-loaded player, no restart
-        binding.btnRewind.setOnClickListener  { jumpBy(-SEEK_JUMP_SECONDS) }
-        binding.btnForward.setOnClickListener { jumpBy(SEEK_JUMP_SECONDS) }
+        // Chapter bookmark
+        binding.btnAddChapter.setOnClickListener {
+            val pos = player?.currentPosition ?: 0L
+            showAddChapterDialog(pos)
+        }
 
-        binding.btnPrev.setOnClickListener { playAdjacent(-1) }
-        binding.btnNext.setOnClickListener { playAdjacent(1) }
-        binding.btnFullscreen.setOnClickListener { toggleFullscreen() }
-
-        // ── Playback seekbar ──────────────────────────────────────────────────
+        // Playback seekbar
         binding.seekPlayback.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (!fromUser || isBindingUi) return
                 val exo = player ?: return
                 val dur = liveDurationMs()
-                // Map seekbar progress to absolute position clamped inside trim window
                 val trimLo  = working.trimStartMs.coerceAtLeast(0L)
                 val trimHi  = if (working.trimEndMs > 0L) working.trimEndMs else dur
                 val seekTo  = (dur * progress / 1000L).coerceIn(trimLo, trimHi)
@@ -359,12 +617,11 @@ class PlayerActivity : AppCompatActivity() {
             }
             override fun onStartTrackingTouch(sb: SeekBar?) { userScrubbingPlayback = true }
             override fun onStopTrackingTouch(sb: SeekBar?)  {
-                userScrubbingPlayback = false
-                persistProgress()
+                userScrubbingPlayback = false; persistProgress()
             }
         })
 
-        // ── Pitch ─────────────────────────────────────────────────────────────
+        // Pitch
         binding.seekPitch.setOnSeekBarChangeListener(seekBarListener(
             onChange = { p, fromUser -> if (fromUser) applyPitchStep(p) },
             onStop   = { persistPrefs() }
@@ -381,7 +638,7 @@ class PlayerActivity : AppCompatActivity() {
             binding.seekPitch.progress = 6; applyPitchStep(6); persistPrefs()
         }
 
-        // ── Speed ─────────────────────────────────────────────────────────────
+        // Speed
         binding.seekSpeed.setOnSeekBarChangeListener(seekBarListener(
             onChange = { p, fromUser -> if (fromUser) applySpeedStep(p) },
             onStop   = { persistPrefs() }
@@ -399,7 +656,7 @@ class PlayerActivity : AppCompatActivity() {
             binding.seekSpeed.progress = np; applySpeedStep(np); persistPrefs()
         }
 
-        // ── Volume ────────────────────────────────────────────────────────────
+        // Volume
         binding.seekVolume.setOnSeekBarChangeListener(seekBarListener(
             onChange = { p, fromUser -> if (fromUser) applyVolumeStep(p) },
             onStop   = { persistPrefs() }
@@ -413,7 +670,7 @@ class PlayerActivity : AppCompatActivity() {
             binding.seekVolume.progress = np; applyVolumeStep(np); persistPrefs()
         }
 
-        // ── Trim seekbars — only write on finger-lift, never during binding ───
+        // Trim
         binding.seekTrimStart.setOnSeekBarChangeListener(seekBarListener(
             onStop = { if (!isBindingUi) { readTrimFromSeekBars(); persistPrefs() } }
         ))
@@ -421,7 +678,7 @@ class PlayerActivity : AppCompatActivity() {
             onStop = { if (!isBindingUi) { readTrimFromSeekBars(); persistPrefs() } }
         ))
 
-        // ── Switches ──────────────────────────────────────────────────────────
+        // Switches
         binding.switchLoop.setOnCheckedChangeListener { _, checked ->
             if (isBindingUi) return@setOnCheckedChangeListener
             working = working.copy(loopPlayback = checked)
@@ -430,11 +687,10 @@ class PlayerActivity : AppCompatActivity() {
         }
         binding.switchAutoNext.setOnCheckedChangeListener { _, checked ->
             if (isBindingUi) return@setOnCheckedChangeListener
-            working = working.copy(autoPlayNext = checked)
-            persistPrefs()
+            working = working.copy(autoPlayNext = checked); persistPrefs()
         }
 
-        // ── Favourite ─────────────────────────────────────────────────────────
+        // Favourite
         binding.btnFavorite.setOnClickListener {
             val next = !working.favorite
             working = working.copy(favorite = next)
@@ -444,7 +700,7 @@ class PlayerActivity : AppCompatActivity() {
             )
         }
 
-        // ── Save prefs: apply in-place, no pipeline restart ───────────────────
+        // Save prefs
         binding.btnSavePrefs.setOnClickListener {
             readTrimFromSeekBars()
             working = working.copy(
@@ -457,16 +713,38 @@ class PlayerActivity : AppCompatActivity() {
             )
             persistPrefs()
             applyPitchAndSpeed(working.pitchSemitones, currentSpeed)
-            player?.volume = currentVolume
+            player?.volume = currentVolume * working.audioBoost.coerceIn(1f, 2f)
             player?.repeatMode = if (working.loopPlayback) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
-            applyEnhancementOverlay()
+            applyEnhancementMatrix()
             Toast.makeText(this, "Saved for this video", Toast.LENGTH_SHORT).show()
         }
 
         refreshNavButtons()
     }
 
+    // ── Chapter dialog ────────────────────────────────────────────────────────
+
+    private fun showAddChapterDialog(posMs: Long) {
+        val input = android.widget.EditText(this).apply {
+            hint = "Chapter name"
+            setTextColor(Color.WHITE)
+            setSingleLine(true)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Add chapter at ${FormatUtils.formatDuration(posMs)}")
+            .setView(input)
+            .setPositiveButton("Add") { _, _ ->
+                val label = input.text.toString().trim().ifBlank { "Chapter" }
+                repo.addChapter(working.id, posMs, label)
+                chapters = repo.listChapters(working.id)
+                Toast.makeText(this, "Chapter added: $label", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     // ── Apply helpers ─────────────────────────────────────────────────────────
+
     private fun applyPitchStep(progress: Int) {
         val semis = (progress - 6).coerceIn(-6, 6)
         binding.pitchLabel.text = pitchLabel(semis)
@@ -485,10 +763,11 @@ class PlayerActivity : AppCompatActivity() {
         currentVolume = progress / 100f
         binding.tvVolumeValue.text = "$progress%"
         working = working.copy(volumeLevel = currentVolume)
-        player?.volume = currentVolume
+        player?.volume = currentVolume * working.audioBoost.coerceIn(1f, 2f)
     }
 
     // ── Persistence ───────────────────────────────────────────────────────────
+
     private fun persistPrefs() {
         if (working.id <= 0L) return
         repo.savePreferences(working)
@@ -497,25 +776,19 @@ class PlayerActivity : AppCompatActivity() {
     private fun persistProgress() {
         val exo = player ?: return
         if (working.id <= 0L) return
-        // currentPosition is already absolute (file ms) — no offset needed
         repo.savePlaybackPosition(working.id, exo.currentPosition.coerceAtLeast(0L))
     }
 
     // ── Seek & navigation ─────────────────────────────────────────────────────
-    /**
-     * Jump [deltaSec] seconds from current absolute position.
-     * Clamps within the trim window. Does NOT stop/prepare — pure seekTo.
-     */
+
     private fun jumpBy(deltaSec: Int) {
-        val exo    = player ?: return
-        val pos    = exo.currentPosition                      // absolute ms
-        val dur    = liveDurationMs()
+        val exo = player ?: return
+        val dur = liveDurationMs()
         val trimLo = working.trimStartMs.coerceAtLeast(0L)
         val trimHi = if (working.trimEndMs > 0L) working.trimEndMs else dur
-        val newPos = (pos + deltaSec * 1000L).coerceIn(trimLo, trimHi)
+        val newPos = (exo.currentPosition + deltaSec * 1000L).coerceIn(trimLo, trimHi)
         exo.seekTo(newPos)
-        persistProgress()
-        tickTimeline()
+        persistProgress(); tickTimeline()
     }
 
     private fun playAdjacent(delta: Int) {
@@ -531,6 +804,8 @@ class PlayerActivity : AppCompatActivity() {
         working = fresh
         currentSpeed  = working.playbackSpeed.coerceIn(0.5f, 2.0f)
         currentVolume = working.volumeLevel.coerceIn(0f, 1f)
+        currentZoom   = working.zoomLevel.coerceIn(1f, 3f)
+        chapters      = repo.listChapters(working.id)
         bindUiFromWorking()
         attachCurrentMedia(play = true)
         refreshNavButtons()
@@ -552,23 +827,41 @@ class PlayerActivity : AppCompatActivity() {
         )
     }
 
+    // ── Fullscreen & PiP ─────────────────────────────────────────────────────
+
     private fun toggleFullscreen() {
         isFullscreen = !isFullscreen
         if (isFullscreen) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             supportActionBar?.hide()
-            binding.playerView.layoutParams.height = android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            binding.playerSurface.layoutParams.height = android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            scheduleHideControls()
         } else {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             supportActionBar?.show()
-            binding.playerView.layoutParams.height = (220 * resources.displayMetrics.density).toInt()
+            binding.playerSurface.layoutParams.height = (220 * resources.displayMetrics.density).toInt()
+            showControls()
         }
-        binding.playerView.requestLayout()
+        binding.playerSurface.requestLayout()
+    }
+
+    private fun enterPiP() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val rational = Rational(16, 9)
+        val params = PictureInPictureParams.Builder()
+            .setAspectRatio(rational)
+            .build()
+        enterPictureInPictureMode(params)
     }
 
     // ── Utilities ─────────────────────────────────────────────────────────────
+
+    private fun showAndFinish(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); finish()
+    }
+
     private fun seekBarListener(
         onChange: (Int, Boolean) -> Unit = { _, _ -> },
         onStop:   () -> Unit             = {},
@@ -584,9 +877,9 @@ class PlayerActivity : AppCompatActivity() {
     private fun pitchLabel(semis: Int)     = "${if (semis > 0) "+$semis" else "$semis"} st"
 
     companion object {
-        private const val SEEK_JUMP_SECONDS = 10
-        const val EXTRA_VIDEO_ID       = "video_id"
-        const val EXTRA_PLAYLIST_IDS   = "playlist_ids"
-        const val EXTRA_PLAYLIST_INDEX = "playlist_index"
+        private const val SEEK_JUMP_SECONDS   = 10
+        const val EXTRA_VIDEO_ID              = "video_id"
+        const val EXTRA_PLAYLIST_IDS          = "playlist_ids"
+        const val EXTRA_PLAYLIST_INDEX        = "playlist_index"
     }
 }

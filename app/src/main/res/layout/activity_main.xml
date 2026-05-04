@@ -79,6 +79,25 @@
                 app:iconTint="@color/crow_accent_cyan"
                 app:strokeColor="@color/crow_accent_cyan" />
 
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContinueWatching"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="start|center_vertical"
+                android:text="Continue Watching"
+                android:textColor="@color/crow_accent_green"
+                app:icon="@android:drawable/ic_media_play"
+                app:iconGravity="textStart"
+                app:iconSize="20dp"
+                app:iconPadding="14dp"
+                app:iconTint="@color/crow_accent_green"
+                app:strokeColor="@color/crow_accent_green" />
+
             <!-- ── Reset library ───────────────────────────── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnResetLibrary"

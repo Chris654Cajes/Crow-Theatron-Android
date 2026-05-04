@@ -2,6 +2,7 @@ package com.crowtheatron.app.library
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.crowtheatron.app.R
@@ -10,8 +11,9 @@ import com.crowtheatron.app.databinding.ActivityLibraryBinding
 import com.crowtheatron.app.player.PlayerActivity
 import com.crowtheatron.app.ui.BottomNavHelper
 import com.crowtheatron.app.ui.LibraryAdapter
-import com.crowtheatron.app.ui.setContentWithCrowInsets
+import com.crowtheatron.app.ui.LibraryListItem
 import com.crowtheatron.app.ui.buildGroupedItems
+import com.crowtheatron.app.ui.setContentWithCrowInsets
 
 class LibraryActivity : AppCompatActivity() {
 
@@ -24,10 +26,18 @@ class LibraryActivity : AppCompatActivity() {
         setContentWithCrowInsets(binding.root)
 
         val mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_ALL
-        val navSelected = if (mode == MODE_FAVORITES) R.id.nav_favorites else R.id.nav_library
-        binding.toolbar.title = getString(
-            if (mode == MODE_FAVORITES) R.string.favorites_title else R.string.library_title
-        )
+        val navSelected = when (mode) {
+            MODE_FAVORITES        -> R.id.nav_favorites
+            MODE_CONTINUE         -> R.id.nav_library
+            MODE_RECENTLY_PLAYED  -> R.id.nav_memory
+            else                  -> R.id.nav_library
+        }
+        binding.toolbar.title = getString(when (mode) {
+            MODE_FAVORITES       -> R.string.favorites_title
+            MODE_CONTINUE        -> R.string.section_continue_watching
+            MODE_RECENTLY_PLAYED -> R.string.memory_title
+            else                 -> R.string.library_title
+        })
         BottomNavHelper.setup(this, binding.bottomNav, navSelected)
 
         val adapter = LibraryAdapter { videoId, playlistIds, index ->
@@ -43,18 +53,37 @@ class LibraryActivity : AppCompatActivity() {
         binding.recycler.layoutManager = glm
         binding.recycler.adapter = adapter
 
-        val videos = if (mode == MODE_FAVORITES) repo.listFavorites() else repo.listAllByFolder()
-        val items = buildGroupedItems(videos)
+        val videos = when (mode) {
+            MODE_FAVORITES       -> repo.listFavorites()
+            MODE_CONTINUE        -> repo.listContinueWatching()
+            MODE_RECENTLY_PLAYED -> repo.listRecentlyPlayed()
+            else                 -> repo.listAllByFolder()
+        }
+
+        val items: List<LibraryListItem> = when (mode) {
+            MODE_ALL -> buildGroupedItems(videos)
+            else     -> {
+                // Flat list with single section header
+                if (videos.isEmpty()) emptyList()
+                else buildList {
+                    add(LibraryListItem.Header(binding.toolbar.title?.toString() ?: ""))
+                    addAll(videos.map { LibraryListItem.VideoRow(it) })
+                }
+            }
+        }
+
         adapter.submitList(items)
         binding.empty.visibility =
-            if (items.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+            if (items.isEmpty()) View.VISIBLE else View.GONE
         binding.recycler.visibility =
-            if (items.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+            if (items.isEmpty()) View.GONE else View.VISIBLE
     }
 
     companion object {
-        const val EXTRA_MODE = "mode"
-        const val MODE_ALL = "all"
-        const val MODE_FAVORITES = "favorites"
+        const val EXTRA_MODE         = "mode"
+        const val MODE_ALL           = "all"
+        const val MODE_FAVORITES     = "favorites"
+        const val MODE_CONTINUE      = "continue_watching"
+        const val MODE_RECENTLY_PLAYED = "recently_played"
     }
 }

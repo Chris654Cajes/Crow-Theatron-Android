@@ -1,775 +1,812 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/crow_bg"
-    android:clipToPadding="false">
+    android:background="@color/crow_bg">
 
-    <LinearLayout
+    <!-- ── Main scrollable content ── -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="40dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false">
 
-        <!-- ── Toolbar ── -->
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/crow_surface"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:titleTextColor="@color/crow_accent_yellow" />
-
-        <!-- ── Video surface ── -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:background="@color/crow_pure_black">
-
-            <androidx.media3.ui.PlayerView
-                android:id="@+id/playerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:show_buffering="when_playing"
-                app:surface_type="texture_view"
-                app:use_controller="false" />
-
-            <View
-                android:id="@+id/enhancementOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="false"
-                android:focusable="false"
-                android:visibility="gone" />
-
-            <ImageButton
-                android:id="@+id/btnFullscreen"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Fullscreen"
-                android:src="@android:drawable/ic_menu_zoom"
-                android:tint="@color/crow_on_bg" />
-        </FrameLayout>
-
-        <!-- ── Title ── -->
-        <TextView
-            android:id="@+id/videoTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="2dp"
-            android:textColor="@color/crow_on_bg"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/timeLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="6dp"
-            android:textColor="@color/crow_on_muted"
-            android:textSize="12sp" />
-
-        <!-- ── Playback controls ── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingStart="4dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="4dp"
-            android:paddingBottom="4dp">
+            android:orientation="vertical"
+            android:paddingBottom="40dp">
 
-            <ImageButton
-                android:id="@+id/btnPrev"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@null"
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="@color/crow_accent_yellow" />
-
-            <ImageButton
-                android:id="@+id/btnRewind"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@null"
-                android:src="@android:drawable/ic_media_rew"
-                android:tint="@color/crow_accent_cyan" />
-
-            <ImageButton
-                android:id="@+id/btnPlayPause"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/play"
-                android:src="@android:drawable/ic_media_play"
-                android:tint="@color/crow_accent_red" />
-
-            <ImageButton
-                android:id="@+id/btnForward"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@null"
-                android:src="@android:drawable/ic_media_ff"
-                android:tint="@color/crow_accent_cyan" />
-
-            <ImageButton
-                android:id="@+id/btnNext"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@null"
-                android:src="@android:drawable/ic_media_next"
-                android:tint="@color/crow_accent_yellow" />
-
-            <ImageButton
-                android:id="@+id/btnStop"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/stop"
-                android:src="@android:drawable/ic_delete"
-                android:tint="@color/crow_on_muted" />
-        </LinearLayout>
-
-        <!-- ═══ PLAYBACK TIMELINE ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
+            <!-- ── Toolbar ── -->
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:background="@color/crow_surface"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:titleTextColor="@color/crow_accent_yellow" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="PLAYBACK TIMELINE"
-                        android:textColor="@color/crow_accent_red"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.12"
-                        android:textAllCaps="true" />
-
-                    <!-- tvPlaybackTime wired in updateTimeLabel() -->
-                    <TextView
-                        android:id="@+id/tvPlaybackTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0:00 / 0:00"
-                        android:textColor="@color/crow_accent_cyan"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-                <SeekBar
-                    android:id="@+id/seekPlayback"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="1000"
-                    android:progressDrawable="@drawable/seek_playback_progress"
-                    android:thumbTint="@color/crow_accent_red" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ TRIM WINDOW ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
+            <!-- ── Video surface container (FrameLayout for overlays) ── -->
+            <FrameLayout
+                android:id="@+id/playerSurface"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_height="220dp"
+                android:background="@color/crow_pure_black">
 
-                <TextView
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/playerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="TRIM WINDOW"
-                    android:textColor="@color/crow_accent_yellow"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.12"
-                    android:textAllCaps="true" />
+                    android:layout_height="match_parent"
+                    app:show_buffering="when_playing"
+                    app:surface_type="texture_view"
+                    app:use_controller="false" />
 
-                <TextView
+                <!-- Color overlay for enhancement ambient tints -->
+                <View
+                    android:id="@+id/enhancementOverlay"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:visibility="gone" />
+
+                <!-- ── Gesture hint overlay (seek / brightness / volume) ── -->
+                <FrameLayout
+                    android:id="@+id/gestureHintOverlay"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="START POINT"
-                    android:textColor="@color/crow_on_muted"
-                    android:textSize="9sp"
-                    android:letterSpacing="0.1"
-                    android:textAllCaps="true" />
-
-                <SeekBar
-                    android:id="@+id/seekTrimStart"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="1000"
-                    android:progressTint="@color/crow_accent_yellow"
-                    android:progressBackgroundTint="@color/crow_divider"
-                    android:thumbTint="@color/crow_accent_yellow" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="END POINT"
-                    android:textColor="@color/crow_on_muted"
-                    android:textSize="9sp"
-                    android:letterSpacing="0.1"
-                    android:textAllCaps="true" />
-
-                <SeekBar
-                    android:id="@+id/seekTrimEnd"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="1000"
-                    android:progressTint="@color/crow_accent_cyan"
-                    android:progressBackgroundTint="@color/crow_divider"
-                    android:thumbTint="@color/crow_accent_cyan" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ PITCH / KEY ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
+                    android:layout_gravity="center"
+                    android:background="#99000000"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="10dp"
+                    android:visibility="gone">
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="PITCH / KEY"
-                        android:textColor="@color/crow_accent_green"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.12"
-                        android:textAllCaps="true" />
-
-                    <TextView
-                        android:id="@+id/pitchLabel"
+                        android:id="@+id/gestureHintText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 st"
-                        android:textColor="@color/crow_accent_green"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- Tick labels -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="2dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="-6"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="-3" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="0" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_accent_green" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="+3" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="+6" android:gravity="end"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                </LinearLayout>
-
-                <SeekBar
-                    android:id="@+id/seekPitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="12"
-                    android:progress="6"
-                    android:progressTint="@color/crow_accent_green"
-                    android:progressBackgroundTint="@color/crow_divider"
-                    android:thumbTint="@color/crow_accent_green" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPitchDown"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="−"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_green"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:layout_marginEnd="10dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_green"
-                        app:backgroundTint="@android:color/transparent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPitchUp"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="+"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_green"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:layout_marginEnd="14dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_green"
-                        app:backgroundTint="@android:color/transparent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPitchReset"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="Reset to 0"
-                        android:textSize="11sp"
-                        android:textColor="@color/crow_accent_green"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_green"
-                        app:backgroundTint="@android:color/transparent" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ PLAYBACK SPEED ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="PLAYBACK SPEED"
-                        android:textColor="@color/crow_accent_orange"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.12"
-                        android:textAllCaps="true" />
-
-                    <TextView
-                        android:id="@+id/tvSpeedValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1.0x"
-                        android:textColor="@color/crow_accent_orange"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="2dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="0.5x"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="0.75x" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="1.0x" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_accent_orange" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="1.5x" android:gravity="center"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="2.0x" android:gravity="end"
-                        android:textSize="9sp" android:textColor="@color/crow_on_muted" />
-                </LinearLayout>
-
-                <SeekBar
-                    android:id="@+id/seekSpeed"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="30"
-                    android:progress="10"
-                    android:progressTint="@color/crow_accent_orange"
-                    android:progressBackgroundTint="@color/crow_divider"
-                    android:thumbTint="@color/crow_accent_orange" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeedDown"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="−"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_orange"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:layout_marginEnd="10dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_orange"
-                        app:backgroundTint="@android:color/transparent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeedUp"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="+"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_orange"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:layout_marginEnd="14dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_orange"
-                        app:backgroundTint="@android:color/transparent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeedReset"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="Reset to 1.0x"
-                        android:textSize="11sp"
-                        android:textColor="@color/crow_accent_orange"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_orange"
-                        app:backgroundTint="@android:color/transparent" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ VOLUME ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="VOLUME"
-                        android:textColor="@color/crow_accent_cyan"
-                        android:textSize="10sp"
-                        android:letterSpacing="0.12"
-                        android:textAllCaps="true" />
-
-                    <TextView
-                        android:id="@+id/tvVolumeValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="100%"
-                        android:textColor="@color/crow_accent_cyan"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <SeekBar
-                    android:id="@+id/seekVolume"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:progress="100"
-                    android:progressTint="@color/crow_accent_cyan"
-                    android:progressBackgroundTint="@color/crow_divider"
-                    android:thumbTint="@color/crow_accent_cyan" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnVolumeDown"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="−"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_cyan"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:layout_marginEnd="10dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_cyan"
-                        app:backgroundTint="@android:color/transparent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnVolumeUp"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="44dp"
-                        android:layout_height="36dp"
-                        android:text="+"
-                        android:textSize="20sp"
-                        android:textColor="@color/crow_accent_cyan"
-                        android:padding="0dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:stateListAnimator="@null"
-                        app:strokeColor="@color/crow_accent_cyan"
-                        app:backgroundTint="@android:color/transparent" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ PLAYBACK OPTIONS ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="PLAYBACK OPTIONS"
-                    android:textColor="@color/crow_accent_blue"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.12"
-                    android:textAllCaps="true" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchAutoNext"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/auto_next"
                         android:textColor="@color/crow_on_bg"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        app:thumbTint="@color/crow_accent_cyan"
-                        app:trackTint="@color/crow_divider" />
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchLoop"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/loop"
-                        android:textColor="@color/crow_on_bg"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        app:thumbTint="@color/crow_accent_cyan"
-                        app:trackTint="@color/crow_divider" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ═══ VISUAL ENHANCEMENT ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="VISUAL ENHANCEMENT"
-                    android:textColor="@color/crow_accent_purple"
-                    android:textSize="10sp"
-                    android:letterSpacing="0.12"
-                    android:textAllCaps="true" />
-
-                <!-- Styled container so Spinner text is visible on dark bg -->
+                <!-- ── Controls overlay (shown/hidden with animation) ── -->
                 <LinearLayout
+                    android:id="@+id/controlsOverlay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/crow_surface"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:layout_gravity="bottom"
+                    android:background="#BB000000"
+                    android:orientation="vertical"
+                    android:paddingBottom="6dp">
 
-                    <Spinner
-                        android:id="@+id/spinnerEnhancement"
+                    <!-- Player transport controls -->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:popupBackground="@color/crow_surface_elevated" />
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/btnPrev"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@null"
+                            android:src="@android:drawable/ic_media_previous"
+                            android:tint="@color/crow_accent_yellow" />
+
+                        <ImageButton
+                            android:id="@+id/btnRewind"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@null"
+                            android:src="@android:drawable/ic_media_rew"
+                            android:tint="@color/crow_accent_cyan" />
+
+                        <ImageButton
+                            android:id="@+id/btnPlayPause"
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/play"
+                            android:src="@android:drawable/ic_media_play"
+                            android:tint="@color/crow_accent_red" />
+
+                        <ImageButton
+                            android:id="@+id/btnForward"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@null"
+                            android:src="@android:drawable/ic_media_ff"
+                            android:tint="@color/crow_accent_cyan" />
+
+                        <ImageButton
+                            android:id="@+id/btnNext"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@null"
+                            android:src="@android:drawable/ic_media_next"
+                            android:tint="@color/crow_accent_yellow" />
+
+                        <ImageButton
+                            android:id="@+id/btnStop"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/stop"
+                            android:src="@android:drawable/ic_delete"
+                            android:tint="@color/crow_on_muted" />
+                    </LinearLayout>
+
+                    <!-- Inline seek bar inside overlay -->
+                    <SeekBar
+                        android:id="@+id/seekPlayback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:max="1000"
+                        android:progressDrawable="@drawable/seek_playback_progress"
+                        android:thumbTint="@color/crow_accent_red" />
+
+                    <!-- Time + action row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvPlaybackTime"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="0:00 / 0:00"
+                            android:textColor="@color/crow_accent_cyan"
+                            android:textSize="11sp" />
+
+                        <!-- Fullscreen -->
+                        <ImageButton
+                            android:id="@+id/btnFullscreen"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Fullscreen"
+                            android:src="@android:drawable/ic_menu_zoom"
+                            android:tint="@color/crow_on_bg" />
+
+                        <!-- PiP -->
+                        <ImageButton
+                            android:id="@+id/btnPip"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Picture-in-picture"
+                            android:src="@android:drawable/ic_menu_crop"
+                            android:tint="@color/crow_accent_purple" />
+
+                        <!-- Chapter bookmark -->
+                        <ImageButton
+                            android:id="@+id/btnAddChapter"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Add chapter"
+                            android:src="@android:drawable/ic_menu_add"
+                            android:tint="@color/crow_accent_green" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
-        <!-- ═══ ACTIONS ═══ -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            app:cardBackgroundColor="@color/crow_surface_elevated"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
+            <!-- ── Title ── -->
+            <TextView
+                android:id="@+id/videoTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:padding="14dp">
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="2dp"
+                android:textColor="@color/crow_on_bg"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnFavorite"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
+            <TextView
+                android:id="@+id/timeLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="6dp"
+                android:textColor="@color/crow_on_muted"
+                android:textSize="12sp" />
+
+            <!-- ── Profiles panel ── -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/favorite_on"
-                    android:textColor="@color/crow_accent_yellow"
-                    app:strokeColor="@color/crow_accent_yellow"
-                    app:backgroundTint="@android:color/transparent" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSavePrefs"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="PLAYBACK PROFILES"
+                        android:textColor="@color/crow_accent_purple"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.12"
+                        android:textAllCaps="true" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnProfiles"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Manage Profiles"
+                        android:textSize="11sp"
+                        android:textColor="@color/crow_accent_purple"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:stateListAnimator="@null"
+                        app:strokeColor="@color/crow_accent_purple"
+                        app:backgroundTint="@android:color/transparent" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ TRIM WINDOW ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/save_prefs"
-                    android:textColor="@color/crow_bg"
-                    app:backgroundTint="@color/crow_accent_blue" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="TRIM WINDOW"
+                        android:textColor="@color/crow_accent_yellow"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.12"
+                        android:textAllCaps="true" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="START POINT"
+                        android:textColor="@color/crow_on_muted"
+                        android:textSize="9sp"
+                        android:letterSpacing="0.1"
+                        android:textAllCaps="true" />
+
+                    <SeekBar
+                        android:id="@+id/seekTrimStart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="1000"
+                        android:progressTint="@color/crow_accent_yellow"
+                        android:progressBackgroundTint="@color/crow_divider"
+                        android:thumbTint="@color/crow_accent_yellow" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="END POINT"
+                        android:textColor="@color/crow_on_muted"
+                        android:textSize="9sp"
+                        android:letterSpacing="0.1"
+                        android:textAllCaps="true" />
+
+                    <SeekBar
+                        android:id="@+id/seekTrimEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="1000"
+                        android:progressTint="@color/crow_accent_cyan"
+                        android:progressBackgroundTint="@color/crow_divider"
+                        android:thumbTint="@color/crow_accent_cyan" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PITCH / KEY ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="PITCH / KEY"
+                            android:textColor="@color/crow_accent_green"
+                            android:textSize="10sp"
+                            android:letterSpacing="0.12"
+                            android:textAllCaps="true" />
+
+                        <TextView
+                            android:id="@+id/pitchLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 st"
+                            android:textColor="@color/crow_accent_green"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekPitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="12"
+                        android:progress="6"
+                        android:progressTint="@color/crow_accent_green"
+                        android:progressBackgroundTint="@color/crow_divider"
+                        android:thumbTint="@color/crow_accent_green" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="14dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPitchDown"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="−"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_green"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:layout_marginEnd="10dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_green"
+                            app:backgroundTint="@android:color/transparent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPitchUp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="+"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_green"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:layout_marginEnd="14dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_green"
+                            app:backgroundTint="@android:color/transparent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnPitchReset"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Reset to 0"
+                            android:textSize="11sp"
+                            android:textColor="@color/crow_accent_green"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_green"
+                            app:backgroundTint="@android:color/transparent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PLAYBACK SPEED ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="PLAYBACK SPEED"
+                            android:textColor="@color/crow_accent_orange"
+                            android:textSize="10sp"
+                            android:letterSpacing="0.12"
+                            android:textAllCaps="true" />
+
+                        <TextView
+                            android:id="@+id/tvSpeedValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1.0x"
+                            android:textColor="@color/crow_accent_orange"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekSpeed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="30"
+                        android:progress="10"
+                        android:progressTint="@color/crow_accent_orange"
+                        android:progressBackgroundTint="@color/crow_divider"
+                        android:thumbTint="@color/crow_accent_orange" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="14dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSpeedDown"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="−"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_orange"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:layout_marginEnd="10dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_orange"
+                            app:backgroundTint="@android:color/transparent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSpeedUp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="+"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_orange"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:layout_marginEnd="14dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_orange"
+                            app:backgroundTint="@android:color/transparent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSpeedReset"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="Reset to 1.0x"
+                            android:textSize="11sp"
+                            android:textColor="@color/crow_accent_orange"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_orange"
+                            app:backgroundTint="@android:color/transparent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ VOLUME ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="VOLUME"
+                            android:textColor="@color/crow_accent_cyan"
+                            android:textSize="10sp"
+                            android:letterSpacing="0.12"
+                            android:textAllCaps="true" />
+
+                        <TextView
+                            android:id="@+id/tvVolumeValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100%"
+                            android:textColor="@color/crow_accent_cyan"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekVolume"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:progress="100"
+                        android:progressTint="@color/crow_accent_cyan"
+                        android:progressBackgroundTint="@color/crow_divider"
+                        android:thumbTint="@color/crow_accent_cyan" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="14dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnVolumeDown"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="−"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_cyan"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:layout_marginEnd="10dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_cyan"
+                            app:backgroundTint="@android:color/transparent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnVolumeUp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="44dp"
+                            android:layout_height="36dp"
+                            android:text="+"
+                            android:textSize="20sp"
+                            android:textColor="@color/crow_accent_cyan"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:stateListAnimator="@null"
+                            app:strokeColor="@color/crow_accent_cyan"
+                            app:backgroundTint="@android:color/transparent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PLAYBACK OPTIONS ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="PLAYBACK OPTIONS"
+                        android:textColor="@color/crow_accent_blue"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.12"
+                        android:textAllCaps="true" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switchAutoNext"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/auto_next"
+                            android:textColor="@color/crow_on_bg"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            app:thumbTint="@color/crow_accent_cyan"
+                            app:trackTint="@color/crow_divider" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switchLoop"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/loop"
+                            android:textColor="@color/crow_on_bg"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            app:thumbTint="@color/crow_accent_cyan"
+                            app:trackTint="@color/crow_divider" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ VISUAL ENHANCEMENT ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="VISUAL ENHANCEMENT"
+                        android:textColor="@color/crow_accent_purple"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.12"
+                        android:textAllCaps="true" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/crow_surface"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <Spinner
+                            android:id="@+id/spinnerEnhancement"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:popupBackground="@color/crow_surface_elevated" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ ACTIONS ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="12dp"
+                app:cardBackgroundColor="@color/crow_surface_elevated"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="14dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFavorite"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/favorite_on"
+                        android:textColor="@color/crow_accent_yellow"
+                        app:strokeColor="@color/crow_accent_yellow"
+                        app:backgroundTint="@android:color/transparent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSavePrefs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/save_prefs"
+                        android:textColor="@color/crow_bg"
+                        app:backgroundTint="@color/crow_accent_blue" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ── Controls panel (the scrollable panel reference) ── -->
+    <!-- Note: controlsPanel is the overlay on the video surface, referenced by id in Activity -->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -20,9 +20,30 @@ data class VideoEntity(
     val loopPlayback: Boolean = false,
     val enhancement: EnhancementMode = EnhancementMode.NONE,
     val lastPlayedAt: Long = 0L,
-    // Persisted playback customisations
     val playbackSpeed: Float = 1.0f,
     val volumeLevel: Float = 1.0f,
+    // Video enhancement sliders
+    val brightness: Float = 0f,
+    val contrast: Float = 1f,
+    val saturation: Float = 1f,
+    val hue: Float = 0f,
+    val sharpness: Float = 0f,
+    // Display
+    val zoomLevel: Float = 1f,
+    val cropMode: CropMode = CropMode.FIT,
+    // Audio
+    val audioBoost: Float = 1f,
+    val eqPreset: EqPreset = EqPreset.FLAT,
+    // Subtitle
+    val subtitleTrackIndex: Int = -1,
+    val subtitleOffsetMs: Long = 0L,
+    val subtitleSizeSp: Float = 16f,
+    val subtitleBold: Boolean = false,
+    val subtitleBackgroundAlpha: Int = 128,
+    // Orientation
+    val preferredOrientation: Int = -1,
+    // Active profile
+    val activeProfileId: Long = 0L,
 ) {
     val contentUri: Uri get() = Uri.parse(uriString)
 

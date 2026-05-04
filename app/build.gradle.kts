@@ -11,18 +11,21 @@ android {
         applicationId = "com.crowtheatron.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -44,13 +47,20 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
+    // ExoPlayer / Media3
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
     implementation(libs.media3.common)
+    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.process)
+    // Document file (folder picker)
     implementation(libs.androidx.documentfile)
+    // CoordinatorLayout (used in player layout)
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -11,22 +11,44 @@
     <string name="scanning">Scanning videos…</string>
     <string name="library_title">Library</string>
     <string name="favorites_title">Favorites</string>
-    <string name="memory_title">Playback memory</string>
-    <string name="explore_title">Search library</string>
-    <string name="enhancement_title">Video enhancement</string>
-    <string name="settings_title">Display &amp; playback</string>
-    <string name="offline_section">Offline storage</string>
+    <string name="memory_title">Playback Memory</string>
+    <string name="explore_title">Search Library</string>
+    <string name="enhancement_title">Video Enhancement</string>
+    <string name="settings_title">Display &amp; Playback</string>
+    <string name="offline_section">Offline Storage</string>
     <string name="duration_unknown">—</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="stop">Stop</string>
-    <string name="pitch_label">Pitch / key (%1$d)</string>
-    <string name="trim_start">Trim start</string>
-    <string name="trim_end">Trim end</string>
-    <string name="save_prefs">Save for this video</string>
+    <string name="pitch_label">Pitch / Key (%1$d)</string>
+    <string name="trim_start">Trim Start</string>
+    <string name="trim_end">Trim End</string>
+    <string name="save_prefs">Save for This Video</string>
     <string name="favorite_on">Favorite</string>
     <string name="favorite_off">Unfavorite</string>
-    <string name="auto_next">Auto-play next</string>
+    <string name="auto_next">Auto-play Next</string>
     <string name="loop">Loop</string>
-    <string name="default_seek_interval">Skip interval (seconds)</string>
+    <string name="default_seek_interval">Skip Interval (seconds)</string>
+    <!-- Profiles -->
+    <string name="profiles_title">Playback Profiles</string>
+    <string name="profile_new">New Profile</string>
+    <string name="profile_activate">Activate</string>
+    <string name="profile_duplicate">Duplicate</string>
+    <string name="profile_rename">Rename</string>
+    <string name="profile_delete">Delete</string>
+    <!-- Gestures -->
+    <string name="gesture_swipe_seek">Swipe horizontally to seek</string>
+    <string name="gesture_swipe_brightness">Swipe left side vertically for brightness</string>
+    <string name="gesture_swipe_volume">Swipe right side vertically for volume</string>
+    <string name="gesture_double_tap_seek">Double-tap sides to seek ±10s</string>
+    <string name="gesture_pinch_zoom">Pinch to zoom</string>
+    <!-- Chapters -->
+    <string name="chapter_add">Add Chapter</string>
+    <string name="chapter_title">Chapter Name</string>
+    <!-- PiP -->
+    <string name="pip_enter">Picture-in-Picture</string>
+    <!-- Library sections -->
+    <string name="section_continue_watching">Continue Watching</string>
+    <string name="section_recently_played">Recently Played</string>
+    <string name="section_favorites">Favorites</string>
 </resources>
